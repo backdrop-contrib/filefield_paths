@@ -12,6 +12,7 @@
  * @return mixed
  */
 function filefield_paths_settings_form($form, $form_state) {
+  $form['config'] = 'filefield_paths.settings';
   $form['filefield_paths_temp_location'] = array(
     '#title'            => t('Temporary file location'),
     '#type'             => 'textfield',
