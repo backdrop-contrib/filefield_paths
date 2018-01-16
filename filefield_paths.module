@@ -101,13 +101,13 @@ function filefield_paths_form_alter(&$form) {
       if (isset($field['form']) && is_array($field['form'])) {
         foreach (array_keys($field['form']) as $delta => $key) {
           $form['instance']['settings']['filefield_paths'][$name][$key] = $field['form'][$key];
-          if (module_exists('token')) {
+//          if (module_exists('token')) {
             $form['instance']['settings']['filefield_paths'][$name][$key]['#element_validate'][] = 'token_element_validate';
             $form['instance']['settings']['filefield_paths'][$name][$key]['#token_types']        = array(
               'file',
               $entity_info['token type']
             );
-          }
+//          }
 
           // Fetch stored value from instance.
           if (isset($settings[$name][$key])) {
@@ -154,14 +154,14 @@ function filefield_paths_form_alter(&$form) {
         );
 
         // Replacement patterns for field.
-        if (module_exists('token')) {
+//        if (module_exists('token')) {
           $form['instance']['settings']['filefield_paths']['token_tree'] = array(
             '#theme'       => 'token_tree',
             '#token_types' => array('file', $entity_info['token type']),
             '#dialog'      => TRUE,
             '#weight'      => 10,
           );
-        }
+//        }
 
         // Redirect
         $form['instance']['settings']['filefield_paths']['redirect'] = array(
@@ -209,8 +209,7 @@ function filefield_paths_temporary_upload_location(&$element) {
   if (isset($element['#type']) && $element['#type'] == 'managed_file' && isset($element['#entity_type']) && isset($element['#field_name']) && isset($element['#bundle'])) {
     $instance = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
     if (isset($instance['settings']['filefield_paths_enabled']) && $instance['settings']['filefield_paths_enabled']) {
-      $element['#upload_location'] = config_get('filefield_paths_temp_location', 'public://filefield_paths');
-      //$element['#upload_location'] = variable_get('filefield_paths_temp_location', 'public://filefield_paths');
+      $element['#upload_location'] = config_get('filefield_paths_temp_location');
     }
     return;
   }
