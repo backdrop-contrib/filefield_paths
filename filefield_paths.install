@@ -68,6 +68,6 @@ function filefield_paths_dependencies() {
  */
 function filefield_paths_update_1000() {
   $config = config('filefield_paths.settings');
-  $config->set('filefield_paths_temp_location', update_variable_get('filefield_paths_temp_location', 'public://filefield_paths');
+  $config->set('filefield_paths_temp_location', update_variable_get('filefield_paths_temp_location', 'public://filefield_paths'));
   update_variable_del('filefield_paths_temp_location');
 }
