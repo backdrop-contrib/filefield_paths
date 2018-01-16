@@ -138,21 +138,19 @@ function filefield_paths_form_alter(&$form) {
         $form['instance']['settings']['filefield_paths'][$name]['options']['pathauto'] = array(
           '#type'          => 'checkbox',
           '#title'         => t('Cleanup using Pathauto'),
-          '#default_value' => isset($settings[$name]['options']['pathauto']) && module_exists('pathauto') ? $settings[$name]['options']['pathauto'] : FALSE,
+          '#default_value' => $settings[$name]['options']['pathauto'],
           '#description'   => t('Cleanup %title using <a href="@pathauto">Pathauto settings</a>.', array(
             '%title'    => t($field['title']),
             '@pathauto' => url('admin/config/search/path/settings')
           )),
-          '#disabled'      => !module_exists('pathauto'),
         );
 
         // Transliterate field with Transliteration module.
         $form['instance']['settings']['filefield_paths'][$name]['options']['transliterate'] = array(
           '#type'          => 'checkbox',
           '#title'         => t('Transliterate'),
-          '#default_value' => isset($settings[$name]['options']['transliterate']) && module_exists('transliteration') ? $settings[$name]['options']['transliterate'] : 0,
+          '#default_value' => $settings[$name]['options']['transliterate'],
           '#description'   => t('Provides one-way string transliteration (romanization) and cleans the %title during upload by replacing unwanted characters.', array('%title' => t($field['title']))),
-          '#disabled'      => !module_exists('transliteration'),
         );
 
         // Replacement patterns for field.
@@ -600,8 +598,8 @@ function filefield_paths_replace_path_callback($matches, $new, $old) {
  * @return mixed|string
  */
 function filefield_paths_process_string($value, $data, $settings = array()) {
-  $transliterate  = module_exists('transliteration') && isset($settings['transliterate']) && $settings['transliterate'];
-  $pathauto       = module_exists('pathauto') && isset($settings['pathauto']) && $settings['pathauto'] == TRUE;
+  $transliterate  = TRUE;
+  $pathauto       = TRUE;
   $remove_slashes = !empty($settings['slashes']);
 
   if ($pathauto == TRUE) {
