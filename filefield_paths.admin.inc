@@ -12,13 +12,12 @@
  * @return mixed
  */
 function filefield_paths_settings_form($form, $form_state) {
-  $form['config'] = 'filefield_paths.settings';
+  $form['#config'] = 'filefield_paths.settings';
   $form['filefield_paths_temp_location'] = array(
     '#title'            => t('Temporary file location'),
     '#type'             => 'textfield',
-    '#default_value'    => config_get('filefield_paths_temp_location', 'public://filefield_paths'),
-    //'#default_value'    => variable_get('filefield_paths_temp_location', 'public://filefield_paths'),
-    '#description'      => t('The location that unprocessed files will be uploaded priot to being processed by File (Field) Paths.<br />It is recommended that you use the temporary file system (temporary://) if your server configuration allows for that.'),
+    '#default_value'    => config_get('filefield_paths_temp_location'),
+    '#description'      => t('The location that unprocessed files will be uploaded prior to being processed by File (Field) Paths.<br />It is recommended that you use the temporary file system (temporary://) if your server configuration allows for that.'),
     '#element_validate' => array('filefield_paths_settings_form_temp_location_validate'),
   );
 
