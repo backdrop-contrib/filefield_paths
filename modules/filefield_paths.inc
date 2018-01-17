@@ -43,15 +43,21 @@ function filefield_paths_filefield_paths_field_settings($field, $instance) {
   );
 }
 
-/**
+ /**
  * Implements hook_filefield_paths_process_file().
  *
  * @param $type
+ *   The entity type containing the files for processing.
  * @param $entity
+ *   The entity containing the files for processing.
  * @param $field
+ *   The definition of the field containing the files for processing.
  * @param $instance
+ *   The instance of the field containing the files for processing.
  * @param $langcode
+ *   The language code of the field containing the files for processing.
  * @param $items
+ *   A pass-by-reference array of all the files for processing.
  */
 function filefield_paths_filefield_paths_process_file($type, $entity, $field, $instance, $langcode, &$items) {
   if (isset($instance['settings']['filefield_paths'])) {
@@ -60,9 +66,9 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
     // Check that the destination is writeable.
     $wrappers = file_get_stream_wrappers(STREAM_WRAPPERS_WRITE);
     foreach ($items as &$file) {
+      print_r($file);
       $source_scheme = file_uri_scheme($file['uri']);
       $temporary_scheme = file_uri_scheme(config_get('filefield_paths.settings', 'filefield_paths_temp_location'));
-      //$temporary_scheme = file_uri_scheme(variable_get('filefield_paths_temp_location', 'public://filefield_paths'));
       $destination_scheme = $field['settings']['uri_scheme'];
       if (in_array($source_scheme, array($temporary_scheme, $destination_scheme)) && !empty($wrappers[$destination_scheme])) {
         // Process file if this is a new entity, 'Active updating' is set or
@@ -76,7 +82,7 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
         }
 
         $token_data = array(
-          'file' => (object) $file,
+          'file' => entity_create('file', $file),
           $type  => $entity
         );
 
@@ -102,7 +108,7 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
         // Finalize file if necessary.
         if ($file !== $old_file) {
           $dirname = drupal_dirname($file['uri']);
-          if (file_prepare_directory($dirname, FILE_CREATE_DIRECTORY) && $new_file = file_move((object) $old_file, $file['uri'])) {
+          if (file_prepare_directory($dirname, FILE_CREATE_DIRECTORY) && $new_file = file_move(entity_create('file', $file), $file['uri'])) {
             // Process regular expression.
             _filefield_paths_replace_path($old_file['uri'], $file['uri'], $entity);
 
