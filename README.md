@@ -38,10 +38,10 @@ Features
 Recommended Modules
 -------------------
 
-* [Pathauto](https://www.drupal.org/project/pathauto) - in BacdropCMS core for now
-* [Redirect](https://www.drupal.org/project/redirect) - in BacdropCMS core for now
-* [Token](https://www.drupal.org/project/token) - in BacdropCMS core for now
-* [Transliteration](https://www.drupal.org/project/transliteration) - in BacdropCMS core for now
+* [Pathauto](https://www.drupal.org/project/pathauto) - in BackdropCMS core for now
+* [Redirect](https://www.drupal.org/project/redirect) - in BackdropCMS core for now
+* [Token](https://www.drupal.org/project/token) - in BackdropCMS core for now
+* [Transliteration](https://www.drupal.org/project/transliteration) - in BackdropCMS core for now
 
 
 
