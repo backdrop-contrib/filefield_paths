@@ -66,7 +66,6 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
     // Check that the destination is writeable.
     $wrappers = file_get_stream_wrappers(STREAM_WRAPPERS_WRITE);
     foreach ($items as &$file) {
-      print_r($file);
       $source_scheme = file_uri_scheme($file['uri']);
       $temporary_scheme = file_uri_scheme(config_get('filefield_paths.settings', 'filefield_paths_temp_location'));
       $destination_scheme = $field['settings']['uri_scheme'];
