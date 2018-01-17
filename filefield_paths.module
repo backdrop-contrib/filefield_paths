@@ -395,8 +395,7 @@ function _filefield_paths_create_redirect($source, $path) {
     '@path'   => $path
   ), WATCHDOG_DEBUG);
 
-  $redirect = new stdClass();
-  redirect_object_prepare($redirect);
+  $redirect = new Redirect();
 
   $parsed_source = parse_url(file_create_url($source), PHP_URL_PATH);
   $parsed_path   = parse_url(file_create_url($path), PHP_URL_PATH);
