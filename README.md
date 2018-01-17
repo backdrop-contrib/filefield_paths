@@ -38,10 +38,10 @@ Features
 Recommended Modules
 -------------------
 
-* [Pathauto](https://www.drupal.org/project/pathauto)
-* [Redirect](https://www.drupal.org/project/redirect)
-* [Token](https://www.drupal.org/project/token)
-* [Transliteration](https://www.drupal.org/project/transliteration)
+* [Pathauto](https://www.drupal.org/project/pathauto) - in BacdropCMS core for now
+* [Redirect](https://www.drupal.org/project/redirect) - in BacdropCMS core for now
+* [Token](https://www.drupal.org/project/token) - in BacdropCMS core for now
+* [Transliteration](https://www.drupal.org/project/transliteration) - in BacdropCMS core for now
 
 
 
@@ -98,3 +98,5 @@ File (Field) Paths was written and is maintained by Stuart Clark (deciphered).
 
 * http://stuar.tc/lark
 * http://twitter.com/Decipher
+
+File (Field) Paths is porting to Backdrop CMS by Leonid Kolesnik (kleomash).
