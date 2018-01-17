@@ -602,8 +602,9 @@ function filefield_paths_process_string($value, $data, $settings = array()) {
   $remove_slashes = !empty($settings['slashes']);
 
   if ($pathauto == TRUE) {
-    module_load_include('inc', 'pathauto');
+    module_load_include('inc', 'path');
   }
+  require_once BACKDROP_ROOT.'/core/includes/transliteration.inc';
 
   // If '/' is to be removed from tokens, token replacement need to happen after
   // splitting the paths to subdirs, otherwise tokens containing '/' will be
@@ -630,18 +631,18 @@ function filefield_paths_process_string($value, $data, $settings = array()) {
             $path .= $pathinfo['dirname'] . '/';
           }
           $path .= $pathinfo['filename'];
-          $path = pathauto_cleanstring($path);
+          $path = path_clean_string($path);
           if (!empty($pathinfo['extension'])) {
-            $path .= '.' . pathauto_cleanstring($pathinfo['extension']);
+            $path .= '.' . path_clean_string($pathinfo['extension']);
           }
           $path = str_replace('/', '', $path);
         }
         else {
-          $path = str_replace($pathinfo['filename'], pathauto_cleanstring($pathinfo['filename']), $path);
+          $path = str_replace($pathinfo['filename'], path_clean_string($pathinfo['filename']), $path);
         }
       }
       else {
-        $path = pathauto_cleanstring($path);
+        $path = path_clean_string($path);
       }
     }
     elseif ($remove_slashes) {
