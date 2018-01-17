@@ -209,7 +209,7 @@ function filefield_paths_temporary_upload_location(&$element) {
   if (isset($element['#type']) && $element['#type'] == 'managed_file' && isset($element['#entity_type']) && isset($element['#field_name']) && isset($element['#bundle'])) {
     $instance = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
     if (isset($instance['settings']['filefield_paths_enabled']) && $instance['settings']['filefield_paths_enabled']) {
-      $element['#upload_location'] = config_get('filefield_paths_temp_location');
+      $element['#upload_location'] = config_get('filefield_paths.settings', 'filefield_paths_temp_location');
     }
     return;
   }
