@@ -50,19 +50,19 @@ function filefield_paths_tokens($type, $tokens, array $data = array()) {
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'ffp-name-only':
-          $basename                = drupal_basename($file->filename);
+          $basename                = backdrop_basename($file->filename);
           $extension               = preg_match('/\.[^.]+$/', $basename, $matches) ? $matches[0] : NULL;
-          $replacements[$original] = !is_null($extension) ? drupal_substr($basename, 0, drupal_strlen($basename) - drupal_strlen($extension)) : $basename;
+          $replacements[$original] = !is_null($extension) ? backdrop_substr($basename, 0, backdrop_strlen($basename) - backdrop_strlen($extension)) : $basename;
           break;
 
         case 'ffp-name-only-original':
-          $basename                = drupal_basename($file->origname);
+          $basename                = backdrop_basename($file->origname);
           $extension               = preg_match('/\.[^.]+$/', $basename, $matches) ? $matches[0] : NULL;
-          $replacements[$original] = !is_null($extension) ? drupal_substr($basename, 0, drupal_strlen($basename) - drupal_strlen($extension)) : $basename;
+          $replacements[$original] = !is_null($extension) ? backdrop_substr($basename, 0, backdrop_strlen($basename) - backdrop_strlen($extension)) : $basename;
           break;
 
         case 'ffp-extension-original':
-          $replacements[$original] = preg_match('/[^.]+$/', drupal_basename($file->origname), $matches) ? $matches[0] : NULL;
+          $replacements[$original] = preg_match('/[^.]+$/', backdrop_basename($file->origname), $matches) ? $matches[0] : NULL;
           break;
       }
     }

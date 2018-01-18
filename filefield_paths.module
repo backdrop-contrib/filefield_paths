@@ -33,7 +33,7 @@ function filefield_paths_config_info(){
 function filefield_paths_menu() {
   $items['admin/config/media/file-system/filefield-paths'] = array(
     'title'            => t('File (Field) Paths settings'),
-    'page callback'    => 'drupal_get_form',
+    'page callback'    => 'backdrop_get_form',
     'page arguments'   => array('filefield_paths_settings_form'),
     'access arguments' => array('administer site configuration'),
     'type'             => MENU_NORMAL_ITEM,
@@ -400,8 +400,8 @@ function _filefield_paths_create_redirect($source, $path) {
   $parsed_source = parse_url(file_create_url($source), PHP_URL_PATH);
   $parsed_path   = parse_url(file_create_url($path), PHP_URL_PATH);
 
-  $redirect->source   = drupal_substr(urldecode($parsed_source), drupal_strlen($base_path));
-  $redirect->redirect = drupal_substr(urldecode($parsed_path), drupal_strlen($base_path));
+  $redirect->source   = backdrop_substr(urldecode($parsed_source), backdrop_strlen($base_path));
+  $redirect->redirect = backdrop_substr(urldecode($parsed_path), backdrop_strlen($base_path));
 
   // Check if the redirect exists before saving.
   $hash = redirect_hash($redirect);
@@ -438,7 +438,7 @@ function _filefield_paths_replace_path($old, $new, $entity) {
   // General all path variations.
   $paths['raw']                = preg_quote($info['host'], '/');
   $paths['urlencode']          = preg_quote(urlencode($info['host']), '/');
-  $paths['drupal_encode_path'] = preg_quote(drupal_encode_path($info['host']), '/');
+  $paths['backdrop_encode_path'] = preg_quote(backdrop_encode_path($info['host']), '/');
 
   $paths = implode('|', $paths);
 
@@ -488,7 +488,7 @@ function _filefield_paths_replace_path($old, $new, $entity) {
  * @return mixed
  */
 function _filefield_paths_replace_path_get_prefixes($scheme, $preg_quote = FALSE, $reset = FALSE) {
-  $prefixes =& drupal_static(__FUNCTION__, array());
+  $prefixes =& backdrop_static(__FUNCTION__, array());
 
   // Force clean urls on.
   $clean_url = config_get('system.core', 'clean_url');
@@ -499,11 +499,11 @@ function _filefield_paths_replace_path_get_prefixes($scheme, $preg_quote = FALSE
     $prefixes[$id]['uri']      = "{$scheme}://";
     $prefixes[$id]['absolute'] = file_create_url($prefixes[$id]['uri']);
     $prefixes[$id]['relative'] = parse_url($prefixes[$id]['absolute'], PHP_URL_PATH);
-    $prefixes[$id]['unclean']  = '?q=' . drupal_substr($prefixes[$id]['relative'], drupal_strlen(base_path()));
+    $prefixes[$id]['unclean']  = '?q=' . backdrop_substr($prefixes[$id]['relative'], backdrop_strlen(base_path()));
 
     foreach ($prefixes[$id] as $key => $prefix) {
       $prefixes[$id]["{$key}-urlencode"]          = urlencode($prefix);
-      $prefixes[$id]["{$key}-drupal_encode_path"] = drupal_encode_path($prefix);
+      $prefixes[$id]["{$key}-backdrop_encode_path"] = backdrop_encode_path($prefix);
     }
 
     if ($preg_quote) {
@@ -620,9 +620,9 @@ function filefield_paths_process_string($value, $data, $settings = array()) {
     if ($pathauto == TRUE) {
       if ('file_name' == $settings['context'] && count($paths) == $i + 1) {
         $pathinfo             = pathinfo($path);
-        $basename             = drupal_basename($path);
+        $basename             = backdrop_basename($path);
         $extension            = preg_match('/\.[^.]+$/', $basename, $matches) ? $matches[0] : NULL;
-        $pathinfo['filename'] = !is_null($extension) ? drupal_substr($basename, 0, drupal_strlen($basename) - drupal_strlen($extension)) : $basename;
+        $pathinfo['filename'] = !is_null($extension) ? backdrop_substr($basename, 0, backdrop_strlen($basename) - backdrop_strlen($extension)) : $basename;
 
         if ($remove_slashes) {
           $path = '';
@@ -669,7 +669,7 @@ function filefield_paths_process_string($value, $data, $settings = array()) {
  * @return array
  */
 function _filefield_paths_get_field_types($reset = FALSE) {
-  $field_types = &drupal_static(__FUNCTION__);
+  $field_types = &backdrop_static(__FUNCTION__);
 
   if (empty($field_types) || $reset) {
     $field_types = module_invoke_all('filefield_paths_field_type_info');

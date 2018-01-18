@@ -98,15 +98,15 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
         $file['uri']                                 = file_stream_wrapper_uri_normalize("{$destination_scheme}://{$path}/{$file['filename']}");
 
         // Ensure file uri is no more than 255 characters.
-        if (drupal_strlen($file['uri']) > 255) {
+        if (backdrop_strlen($file['uri']) > 255) {
           watchdog('filefield_paths', 'File path was truncated.', array(), WATCHDOG_INFO);
           $pathinfo    = pathinfo($file['uri']);
-          $file['uri'] = drupal_substr($file['uri'], 0, 254 - drupal_strlen($pathinfo['extension'])) . ".{$pathinfo['extension']}";
+          $file['uri'] = backdrop_substr($file['uri'], 0, 254 - backdrop_strlen($pathinfo['extension'])) . ".{$pathinfo['extension']}";
         }
 
         // Finalize file if necessary.
         if ($file !== $old_file) {
-          $dirname = drupal_dirname($file['uri']);
+          $dirname = backdrop_dirname($file['uri']);
           if (file_prepare_directory($dirname, FILE_CREATE_DIRECTORY) && $new_file = file_move(entity_create('file', $old_file), $file['uri'])) {
             // Process regular expression.
             _filefield_paths_replace_path($old_file['uri'], $file['uri'], $entity);
@@ -117,9 +117,9 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
             }
 
             // Remove any old empty directories.
-            $paths  = explode('/', str_replace("{$source_scheme}://", '', drupal_dirname($old_file['uri'])));
+            $paths  = explode('/', str_replace("{$source_scheme}://", '', backdrop_dirname($old_file['uri'])));
             while ($paths) {
-              if (@drupal_rmdir("{$source_scheme}://" . implode('/', $paths)) == TRUE) {
+              if (@backdrop_rmdir("{$source_scheme}://" . implode('/', $paths)) == TRUE) {
                 array_pop($paths);
                 continue;
               }
