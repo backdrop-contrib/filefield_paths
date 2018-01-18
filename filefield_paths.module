@@ -8,7 +8,7 @@
 /**
  * Include additional files.
  */
-$dirname  = dirname(__FILE__) . "/modules";
+$dirname  = dirname(__FILE__) . "/includes";
 $includes = file_scan_directory($dirname, '/.inc$/');
 foreach (module_list() as $module) {
   if (isset($includes[$file = "{$dirname}/{$module}.inc"])) {
@@ -101,13 +101,11 @@ function filefield_paths_form_alter(&$form) {
       if (isset($field['form']) && is_array($field['form'])) {
         foreach (array_keys($field['form']) as $delta => $key) {
           $form['instance']['settings']['filefield_paths'][$name][$key] = $field['form'][$key];
-//          if (module_exists('token')) {
-            $form['instance']['settings']['filefield_paths'][$name][$key]['#element_validate'][] = 'token_element_validate';
-            $form['instance']['settings']['filefield_paths'][$name][$key]['#token_types']        = array(
-              'file',
-              $entity_info['token type']
-            );
-//          }
+          $form['instance']['settings']['filefield_paths'][$name][$key]['#element_validate'][] = 'token_element_validate';
+          $form['instance']['settings']['filefield_paths'][$name][$key]['#token_types']        = array(
+            'file',
+            $entity_info['token type']
+          );
 
           // Fetch stored value from instance.
           if (isset($settings[$name][$key])) {
@@ -171,10 +169,6 @@ function filefield_paths_form_alter(&$form) {
           '#default_value' => isset($settings['redirect']) ? $settings['redirect'] : FALSE,
           '#weight'        => 11,
         );
-        if (!module_exists('redirect')) {
-          $form['instance']['settings']['filefield_paths']['redirect']['#disabled'] = TRUE;
-          $form['instance']['settings']['filefield_paths']['redirect']['#description'] .= '<br />' . t('Requires the <a href="https://drupal.org/project/redirect" target="_blank">Redirect</a> module.');
-        }
 
         // Retroactive updates.
         $form['instance']['settings']['filefield_paths']['retroactive_update'] = array(
