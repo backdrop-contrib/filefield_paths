@@ -55,6 +55,8 @@ https://github.com/kleomash/filefiled_paths/issues
 Current Maintainers
 -----------------
 
+- [Indigoxela](https://github.com/indigoxela)
+
 File (Field) Paths is porting to Backdrop CMS by Leonid Kolesnik (kleomash).
 
 Credits
