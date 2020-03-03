@@ -3,15 +3,4 @@ description = Adds improved Token based file sorting and renaming functionalitie
 type = module
 package = Fields
 configure = admin/config/media/file-system/filefield-paths
-version = 1.0-dev
 backdrop = 1.x
-
-; Simpletest files.
-;files[] = tests/filefield_paths.test
-;files[] = tests/filefield_paths.general.test
-;files[] = tests/filefield_paths.text_replace.test
-;files[] = tests/filefield_paths.tokens.test
-;files[] = tests/filefield_paths.update.test
-;files[] = tests/pathauto.test
-;files[] = tests/redirect.test
-;files[] = tests/transliteration.test

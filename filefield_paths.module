@@ -132,22 +132,23 @@ function filefield_paths_form_alter(&$form) {
           '#description'   => t('If checked, any slashes (/) in tokens will be removed from %title.', array('%title' => t($field['title']))),
         );
 
-        // Cleanup field with Pathauto module.
-        $form['instance']['settings']['filefield_paths'][$name]['options']['pathauto'] = array(
+        // Cleanup field with Path module.
+        $form['instance']['settings']['filefield_paths'][$name]['options']['path'] = array(
           '#type'          => 'checkbox',
-          '#title'         => t('Cleanup using Pathauto'),
-          '#default_value' => $settings[$name]['options']['pathauto'],
-          '#description'   => t('Cleanup %title using <a href="@pathauto">Pathauto settings</a>.', array(
+          '#title'         => t('Cleanup using Path'),
+          '#default_value' => isset($settings[$name]['options']['path']) ? $settings[$name]['options']['path'] : FALSE,
+          '#description'   => t('Cleanup %title using <a href="@path">Path settings</a>.', array(
             '%title'    => t($field['title']),
-            '@pathauto' => url('admin/config/search/path/settings')
+            '@path' => url('admin/config/urls/path/patterns/settings')
           )),
         );
 
         // Transliterate field with Transliteration module.
+        // TODO: is this still relevant for Backdrop core?
         $form['instance']['settings']['filefield_paths'][$name]['options']['transliterate'] = array(
           '#type'          => 'checkbox',
           '#title'         => t('Transliterate'),
-          '#default_value' => $settings[$name]['options']['transliterate'],
+          '#default_value' => isset($settings[$name]['options']['transliterate']) ? $settings[$name]['options']['transliterate'] : FALSE,
           '#description'   => t('Provides one-way string transliteration (romanization) and cleans the %title during upload by replacing unwanted characters.', array('%title' => t($field['title']))),
         );
 
