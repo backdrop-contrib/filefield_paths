@@ -1,9 +1,7 @@
 File (Field) Paths
 ==================
 
-[![Build Status](https://travis-ci.org/Decipher/filefield_paths.svg)](https://travis-ci.org/Decipher/filefield_paths)
-
-The File (Field) Paths module extends the default functionality of Drupal's core
+The File (Field) Paths module extends the default functionality of Backdrop's core
 File module, Image module and many other File upload modules, by adding the
 ability to use entity based tokens in destination paths and file names.
 
@@ -17,12 +15,12 @@ Features
 * Configurable file paths now use entity tokens in addition to user tokens.
 * Configurable file names.
 * Support for file based fields, including but not limited to:
-    * Drupal core File module.
-    * Drupal core Image module.
+    * Backdrop core File module.
+    * Backdrop core Image module.
     * Video module.
 * File path and filename cleanup options:
     * Remove slashes from tokens.
-    * Filter out words and punctuation by taking advantage of the Pathauto
+    * Filter out words and punctuation by taking advantage of the Path
       module.
     * Convert unicode characters into US-ASCII with the Transliteration module.
 * Automatically updates unprocessed file paths in any Text fields on the entity.
@@ -37,19 +35,11 @@ Installation
 - Install this module using the official Backdrop CMS instructions at
   https://backdropcms.org/guide/modules
 
-Documentation
--------------
-
-Additional documentation is located in the Wiki:
-https://github.com/kleomash/filefiled_paths/wiki/Documentation
-
-
 Issues
 ------
 
 Bugs and Feature requests should be reported in the Issue Queue:
-https://github.com/kleomash/filefiled_paths/issues
-
+https://github.com/backdrop-contrib/filefield_paths/issues
 
 
 Current Maintainers
@@ -57,7 +47,8 @@ Current Maintainers
 
 - [Indigoxela](https://github.com/indigoxela)
 
-File (Field) Paths is porting to Backdrop CMS by Leonid Kolesnik (kleomash).
+File (Field) Paths has been ported to Backdrop CMS by Leonid Kolesnik
+([kleomash](https://github.com/kleomash)).
 
 Credits
 ------
@@ -72,5 +63,3 @@ License
 
 This project is GPL v2 software. See the LICENSE.txt file in this directory for
 complete text.
-
-
