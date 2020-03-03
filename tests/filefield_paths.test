@@ -6,61 +6,107 @@
  */
 
 /**
- * Class FileFieldPathsTestCase
+ * Class FileFieldPathsTestCase.
  */
-class FileFieldPathsTestCase extends FileFieldTestCase {
-  var $content_type = NULL;
-  var $public_files_directory = NULL;
+class FileFieldPathsTestCase extends BackdropWebTestCase {
+  protected $profile = 'testing';
+  protected $admin_user;
+
+  public $content_type = NULL;
+  public $public_files_directory = NULL;
 
   /**
    * @inheritdoc
    */
-  function setUp() {
+  public function setUp() {
     // Setup required modules.
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
       $modules = $modules[0];
     }
-    $modules[] = 'filefield_paths_test';
+    $modules[] = 'field_ui';
+    $modules[] = 'file';
+    $modules[] = 'path';
     $modules[] = 'image';
-    $modules[] = 'token';
+    $modules[] = 'filefield_paths_test';
     parent::setUp($modules);
 
-    // Include all optional dependency files.
-    $dirname  = dirname(__FILE__) . "/../modules";
-    $includes = file_scan_directory($dirname, '/.inc$/');
-    foreach (array_keys($includes) as $file) {
-      require_once $file;
-    }
-
+    // Easy pattern to get the nid.
+    config_set('path.settings', 'node_pattern', 'node/[node:nid]');
     // Create a content type.
-    $content_type       = $this->drupalCreateContentType();
+    $content_type       = $this->backdropCreateContentType();
     $this->content_type = $content_type->name;
+
+    $this->admin_user = $this->backdropCreateUser(array(
+      'access content',
+      'access administration pages',
+      'administer site configuration',
+      'administer content types',
+      'administer nodes',
+      'bypass node access',
+      'administer fields',
+      'create url aliases',
+      'manage files',
+      'delete files',
+    ));
+    $this->backdropLogin($this->admin_user);
   }
 
   /**
    * @inheritdoc
    */
-  function createFileField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
-    parent::createFileField($name, $type_name, $field_settings, $instance_settings, $widget_settings);
-    $this->drupalPost("admin/structure/types/manage/{$this->content_type}/fields/{$name}", array(), t('Save settings'));
+  protected function createFileField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
+    $cardinality = 1;
+    if (isset($field_settings['cardinality'])) {
+      $cardinality = $field_settings['cardinality'];
+      unset($field_settings['cardinality']);
+    }
+    $field = array(
+      'field_name' => $name,
+      'type' => 'file',
+      'cardinality' => $cardinality,
+      'settings' => $field_settings,
+    );
+    field_create_field($field);
+    $this->attachFileField($name, 'node', $type_name, $instance_settings, $widget_settings);
+  }
+
+  /**
+   * Create a field instance.
+   */
+  protected function attachFileField($name, $entity_type, $bundle, $instance_settings = array(), $widget_settings = array()) {
+    $instance = array(
+      'field_name' => $name,
+      'label' => $name,
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+      'required' => !empty($instance_settings['required']),
+      'settings' => array(),
+      'widget' => array(
+        'type' => 'file_generic',
+        'settings' => array(),
+      ),
+    );
+    $instance['settings'] = array_merge($instance['settings'], $instance_settings);
+    $instance['widget']['settings'] = array_merge($instance['widget']['settings'], $widget_settings);
+    field_create_instance($instance);
   }
 
   /**
    * Creates a new image field.
    *
-   * @param $name
+   * @param string $name
    *   The name of the new field (all lowercase), exclude the "field_" prefix.
-   * @param $type_name
+   * @param string $type_name
    *   The node type that this field will be added to.
-   * @param $field_settings
+   * @param array $field_settings
    *   A list of field settings that will be added to the defaults.
-   * @param $instance_settings
+   * @param array $instance_settings
    *   A list of instance settings that will be added to the instance defaults.
-   * @param $widget_settings
+   * @param array $widget_settings
    *   A list of widget settings that will be added to the widget defaults.
    */
-  function createImageField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
+  protected function createImageField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
     $field             = array(
       'field_name'  => $name,
       'type'        => 'image',
@@ -85,6 +131,297 @@ class FileFieldPathsTestCase extends FileFieldTestCase {
     $instance['settings']           = array_merge($instance['settings'], $instance_settings);
     $instance['widget']['settings'] = array_merge($instance['widget']['settings'], $widget_settings);
     field_create_instance($instance);
-    $this->drupalPost("admin/structure/types/manage/{$this->content_type}/fields/{$name}", array(), t('Save settings'));
+    $this->backdropPost("admin/structure/types/manage/{$this->content_type}/fields/{$name}", array(), t('Save settings'));
   }
+
+  /**
+   * Uploads a file to a node.
+   */
+  protected function uploadNodeFile($file, $field_name, $nid_or_type, $new_revision = TRUE, $extras = array()) {
+    $langcode = LANGUAGE_NONE;
+    $edit = array(
+      "title" => $this->randomName(),
+      'revision' => (string) (int) $new_revision,
+    );
+
+    if (is_numeric($nid_or_type)) {
+      $nid = $nid_or_type;
+    }
+    else {
+      // Add a new node.
+      $extras['type'] = $nid_or_type;
+      $node = $this->backdropCreateNode($extras);
+      $nid = $node->nid;
+      // Save at least one revision to better simulate a real site.
+      $this->backdropCreateNode(get_object_vars($node));
+      $node = node_load($nid, NULL, TRUE);
+      $this->assertNotEqual($nid, $node->vid, 'Node revision exists.');
+    }
+
+    // Attach a file to the node.
+    $edit['files[' . $field_name . '_' . $langcode . '_0]'] = backdrop_realpath($file->uri);
+    $this->backdropPost("node/$nid/edit", $edit, t('Save'));
+
+    return $nid;
+  }
+
+  /**
+   * Test that the File (Field) Paths UI works as expected.
+   */
+  public function testAddField() {
+    // Create a File field.
+    $field_name = backdrop_strtolower($this->randomName());
+    $instance_settings = array('file_directory' => "fields/{$field_name}");
+    $this->createFileField($field_name, $this->content_type, array(), $instance_settings);
+
+    // Ensure File (Field) Paths settings are present.
+    $this->backdropGet("admin/structure/types/manage/{$this->content_type}/fields/{$field_name}");
+    $this->assertText('Enable File (Field) Paths?', t('File (Field) Path settings are present.'));
+
+    // Ensure that 'Enable File (Field) Paths?' is a direct sibling of
+    // 'File (Field) Path settings'.
+    $element = $this->xpath('//div[contains(@class, :class)]/following-sibling::*[1]/@id', array(':class' => 'form-item-instance-settings-filefield-paths-enabled'));
+    $this->assert(isset($element[0]) && 'edit-instance-settings-filefield-paths' == (string) $element[0], t('Enable checkbox is next to settings fieldset.'));
+
+    // Ensure that the File path used the File directory as it's default value.
+    $this->assertFieldByName('instance[settings][filefield_paths][file_path][value]', "fields/{$field_name}");
+  }
+
+  /**
+   * Test File (Field) Paths works as normal when no file uploaded.
+   */
+  public function testNoFile() {
+    // Create a File field.
+    $field_name = backdrop_strtolower($this->randomName());
+    $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
+    $instance_settings['filefield_paths']['file_name']['value'] = '[node:nid].[file:ffp-extension-original]';
+    $this->createFileField($field_name, $this->content_type, array(), $instance_settings);
+
+    // Create a node without a file attached.
+    $this->backdropCreateNode(array('type' => $this->content_type));
+  }
+
+  /**
+   * Test a basic file upload with File (Field) Paths.
+   */
+  public function testUploadFile() {
+    $langcode = LANGUAGE_NONE;
+
+    // Create a File field with 'node/[node:nid]' as the File path and
+    // '[node:nid].[file:ffp-extension-original]' as the File name.
+    $field_name = backdrop_strtolower($this->randomName());
+    $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
+    $instance_settings['filefield_paths']['file_name']['value'] = '[node:nid].[file:ffp-extension-original]';
+    $this->createFileField($field_name, $this->content_type, array(), $instance_settings);
+
+    $schemes = array('public', 'private');
+    foreach ($schemes as $scheme) {
+      // Set the field URI scheme.
+      $this->backdropPost("admin/structure/types/manage/{$this->content_type}/fields/{$field_name}", array('field[settings][uri_scheme]' => $scheme), t('Save settings'));
+
+      // Upload a file to a node.
+      $test_file = current($this->backdropGetTestFiles('text'));
+      $this->backdropGet("node/add/{$this->content_type}");
+      $edit['title'] = $this->randomName();
+      $edit["files[{$field_name}_{$langcode}_0]"] = $test_file->uri;
+      $this->backdropPost(NULL, $edit, t('Upload'));
+
+      // Ensure that the file was put into the Temporary file location.
+      $temp_location = config_get('filefield_paths.settings', 'filefield_paths_temp_location');
+      $this->assertRaw(file_create_url("{$temp_location}/{$test_file->filename}"), t('File has been uploaded to the temporary file location.'));
+
+      // Save the node.
+      $this->backdropPost(NULL, array(), t('Save'));
+
+      // Get created Node ID.
+      $matches = array();
+      preg_match('/node\/([0-9]+)/', $this->getUrl(), $matches);
+      $nid = $matches[1];
+
+      // Ensure that the File path has been processed correctly.
+      $uri = file_create_url("{$scheme}://node/{$nid}/{$nid}.txt");
+      $this->assertRaw($uri, t('The File path has been processed correctly.'));
+
+      // Delete the node so we can change the URI scheme.
+      node_delete($nid);
+    }
+  }
+
+  /**
+   * Tests a multivalue file upload with File (Field) Paths.
+   */
+  public function testUploadFileMultivalue() {
+    $langcode = LANGUAGE_NONE;
+
+    // Create a multivalue File field with 'node/[node:nid]' as the File path
+    // and '[file:fid].txt' as the File name.
+    $field_name = backdrop_strtolower($this->randomName());
+    $field_settings['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+    $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
+    $instance_settings['filefield_paths']['file_name']['value'] = '[file:fid].txt';
+    $this->createFileField($field_name, $this->content_type, $field_settings, $instance_settings);
+
+    // Create a node with three (3) test files.
+    $text_files = $this->backdropGetTestFiles('text');
+    $this->backdropGet("node/add/{$this->content_type}");
+    $this->backdropPost(NULL, array("files[{$field_name}_{$langcode}_0]" => backdrop_realpath($text_files[0]->uri)), t('Upload'));
+    $this->backdropPost(NULL, array("files[{$field_name}_{$langcode}_1]" => backdrop_realpath($text_files[1]->uri)), t('Upload'));
+    $edit = array(
+      'title' => $this->randomName(),
+      "files[{$field_name}_{$langcode}_2]" => backdrop_realpath($text_files[1]->uri),
+    );
+    $this->backdropPost(NULL, $edit, t('Save'));
+
+    // Get created Node ID.
+    $matches = array();
+    preg_match('/node\/([0-9]+)/', $this->getUrl(), $matches);
+    $nid = $matches[1];
+
+    // Ensure that the File path has been processed correctly.
+    $this->assertRaw("{$this->public_files_directory}/node/{$nid}/1.txt", t('The first File path has been processed correctly.'));
+    $this->assertRaw("{$this->public_files_directory}/node/{$nid}/2.txt", t('The second File path has been processed correctly.'));
+    $this->assertRaw("{$this->public_files_directory}/node/{$nid}/3.txt", t('The third File path has been processed correctly.'));
+  }
+
+  /**
+   * Test File (Field) Paths with a very long path.
+   */
+  public function testLongPath() {
+    // Create a File field with 'node/[random:hash:sha256]' as the File path.
+    $field_name = backdrop_strtolower($this->randomName());
+    $instance_settings['filefield_paths']['file_path']['value'] = 'node/[random:hash:sha512]/[random:hash:sha512]';
+    $this->createFileField($field_name, $this->content_type, array(), $instance_settings);
+
+    // Create a node with a test file.
+    $test_file = current($this->backdropGetTestFiles('text'));
+    $nid = $this->uploadNodeFile($test_file, $field_name, $this->content_type);
+
+    // Ensure file path is no more than 255 characters.
+    $node = node_load($nid, NULL, TRUE);
+    $this->assert(backdrop_strlen($node->{$field_name}[LANGUAGE_NONE][0]['uri']) <= 255, t('File path is no more than 255 characters'));
+  }
+
+  /**
+   * Test File (Field) Paths on a programmatically added file.
+   */
+  public function testProgrammaticAttach() {
+    // Create a File field with 'node/[node:nid]' as the File path and
+    // '[node:nid].[file:ffp-extension-original]' as the File name.
+    $field_name = backdrop_strtolower($this->randomName());
+    $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
+    $instance_settings['filefield_paths']['file_name']['value'] = '[node:nid].[file:ffp-extension-original]';
+    $this->createFileField($field_name, $this->content_type, array(), $instance_settings);
+
+    // Create a node without an attached file.
+    $node = $this->backdropCreateNode(array('type' => $this->content_type));
+
+    // Create a file object.
+    $test_file = current($this->backdropGetTestFiles('text'));
+
+    $file = new File();
+    $file->fid = NULL;
+    $file->uri = $test_file->uri;
+    $file->filename = basename($file->uri);
+    $file->filemime = file_get_mimetype($file->uri);
+    $file->uid = $GLOBALS['user']->uid;
+    $file->status = FILE_STATUS_PERMANENT;
+    $file->display = TRUE;
+    file_save($file);
+
+    // Adjust timestamp to simulate real-world experience.
+    $file->timestamp = REQUEST_TIME - 60;
+
+    // Attach the file to the node.
+    $node->{$field_name}[LANGUAGE_NONE][0] = (array) $file;
+    node_save($node);
+
+    // Ensure that the File path has been processed correctly.
+    $node = node_load($node->nid, NULL, TRUE);
+    $this->assertEqual("public://node/{$node->nid}/{$node->nid}.txt", $node->{$field_name}[LANGUAGE_NONE][0]['uri'], t('The File path has been processed correctly.'));
+  }
+
+  /**
+   * Test a file usage of a basic file upload with File (Field) Paths.
+   */
+  public function testFileUsage() {
+    // Create a File field with 'node/[node:nid]' as the File path.
+    $field_name = backdrop_strtolower($this->randomName());
+    $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
+    $this->createFileField($field_name, $this->content_type, array(), $instance_settings);
+
+    // Create a node with a test file.
+    $test_file = current($this->backdropGetTestFiles('text'));
+    $nid = $this->uploadNodeFile($test_file, $field_name, $this->content_type);
+
+    // Get file usage for uploaded file.
+    $node = node_load($nid, NULL, TRUE);
+    $items = field_get_items('node', $node, $field_name);
+    $file = file_load($items[0]['fid']);
+    $usage = file_usage_list($file);
+
+    // Ensure file usage count for new node is correct.
+    $this->assert(isset($usage['file']['node'][$nid]) && $usage['file']['node'][$nid] == 1, t('File usage count for new node is correct.'));
+
+    // Update node.
+    $this->backdropPost("node/{$nid}/edit", array(), t('Save'));
+    $usage = file_usage_list($file);
+
+    // Ensure file usage count for updated node is correct.
+    $this->assert(isset($usage['file']['node'][$nid]) && $usage['file']['node'][$nid] == 1, t('File usage count for updated node is correct.'));
+
+    // Update node with revision.
+    $this->backdropPost("node/{$nid}/edit", array('revision' => TRUE), t('Save'));
+    $usage = file_usage_list($file);
+
+    // Ensure file usage count for updated node with revision is correct.
+    $this->assert(isset($usage['file']['node'][$nid]) && $usage['file']['node'][$nid] == 2, t('File usage count for updated node with revision is correct.'));
+  }
+
+  /**
+   * Test File (Field) Paths works with read-only stream wrappers.
+   */
+  public function testReadOnly() {
+    // Create a File field.
+    $field_name = backdrop_strtolower($this->randomName());
+    $field_settings = array('uri_scheme' => 'ffp');
+    $instance_settings = array('file_directory' => "fields/{$field_name}");
+    $this->createImageField($field_name, $this->content_type, $field_settings, $instance_settings);
+
+    // Get a test file.
+    $file = current($this->backdropGetTestFiles('image'));
+
+    // Prepare the file for the test 'ffp://' read-only stream wrapper.
+    $file->uri = str_replace('public', 'ffp', $file->uri);
+    $uri = file_stream_wrapper_uri_normalize($file->uri);
+
+    // Create a file object.
+    $file = new File();
+    $file->fid = NULL;
+    $file->uri = $uri;
+    $file->filename = basename($file->uri);
+    $file->filemime = file_get_mimetype($file->uri);
+    $file->uid = $GLOBALS['user']->uid;
+    $file->status = FILE_STATUS_PERMANENT;
+    $file->display = TRUE;
+    file_save($file);
+
+    // Attach the file to a node.
+    $node = array();
+    $node['type'] = $this->content_type;
+    $node[$field_name][LANGUAGE_NONE][0] = (array) $file;
+
+    $node = $this->backdropCreateNode($node);
+
+    // Ensure file has been attached to a node.
+    $this->assert(isset($node->{$field_name}[LANGUAGE_NONE][0]) && !empty($node->{$field_name}[LANGUAGE_NONE][0]), t('Read-only file is correctly attached to a node.'));
+
+    $edit = array();
+    $edit['instance[settings][filefield_paths][retroactive_update]'] = TRUE;
+    $edit['instance[settings][filefield_paths][file_path][value]'] = 'node/[node:nid]';
+    $this->backdropPost("admin/structure/types/manage/{$this->content_type}/fields/{$field_name}", $edit, t('Save settings'));
+    // Ensure file is still in original location.
+    $this->backdropGet("node/{$node->nid}");
+    $this->assertRaw("{$this->public_files_directory}/{$file->filename}", t('Read-only file not affected by Retroactive updates.'));
+  }
+
 }

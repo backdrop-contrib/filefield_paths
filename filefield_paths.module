@@ -286,6 +286,10 @@ function _filefield_paths_batch_update_process($objects, $instance, &$context) {
     // For each oid, load the object, update the files and save it.
     $oid    = array_shift($context['sandbox']['objects']);
     $entity = current(entity_load($instance['entity_type'], array($oid)));
+    if (!isset($entity->original)) {
+      // Prevent undefined property Node::$original.
+      $entity->original = NULL;
+    }
 
     // Enable active updating if it isn't already enabled.
     $active_updating = $instance['settings']['filefield_paths']['active_updating'];

@@ -1,0 +1,5 @@
+[FileFieldPathsTestCase]
+name = General functionality
+description = Test general functionality.
+group = File (Field) Paths
+file = filefield_paths.test
