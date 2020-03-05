@@ -22,7 +22,7 @@ Features
     * Remove slashes from tokens.
     * Filter out words and punctuation by taking advantage of the Path
       module.
-    * Convert unicode characters into US-ASCII with the Transliteration module.
+    * Convert unicode characters into US-ASCII with core transliteration.
 * Automatically updates unprocessed file paths in any Text fields on the entity.
 * Retroactive updates - rename and/or move previously uploaded files.
 * Active updating - actively rename and/or move previously uploaded files.
