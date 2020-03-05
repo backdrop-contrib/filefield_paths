@@ -141,10 +141,10 @@ function filefield_paths_form_alter(&$form) {
             '%title'    => t($field['title']),
             '@path' => url('admin/config/urls/path/patterns/settings')
           )),
+          '#disabled'      => !module_exists('path'),
         );
 
-        // Transliterate field with Transliteration module.
-        // TODO: is this still relevant for Backdrop core?
+        // Transliterate field with core transliteration.
         $form['instance']['settings']['filefield_paths'][$name]['options']['transliterate'] = array(
           '#type'          => 'checkbox',
           '#title'         => t('Transliterate'),
@@ -153,22 +153,22 @@ function filefield_paths_form_alter(&$form) {
         );
 
         // Replacement patterns for field.
-//        if (module_exists('token')) {
-          $form['instance']['settings']['filefield_paths']['token_tree'] = array(
-            '#theme'       => 'token_tree',
-            '#token_types' => array('file', $entity_info['token type']),
-            '#dialog'      => TRUE,
-            '#weight'      => 10,
-          );
-//        }
+        $form['instance']['settings']['filefield_paths']['token_tree'] = array(
+          '#theme'       => 'token_tree',
+          '#token_types' => array('file', $entity_info['token type']),
+          '#dialog'      => TRUE,
+          '#weight'      => 10,
+        );
 
         // Redirect
+        // TODO does this work properly?
         $form['instance']['settings']['filefield_paths']['redirect'] = array(
           '#type'          => 'checkbox',
           '#title'         => t('Create Redirect'),
           '#description'   => t('Create a redirect to the new location when a previously uploaded file is moved.'),
           '#default_value' => isset($settings['redirect']) ? $settings['redirect'] : FALSE,
           '#weight'        => 11,
+          '#disabled'      => !module_exists('redirect'),
         );
 
         // Retroactive updates.
@@ -597,8 +597,8 @@ function filefield_paths_replace_path_callback($matches, $new, $old) {
  * @return mixed|string
  */
 function filefield_paths_process_string($value, $data, $settings = array()) {
-  $transliterate  = TRUE;
-  $pathauto       = TRUE;
+  $transliterate  = isset($settings['transliterate']) && $settings['transliterate'];
+  $pathauto       = module_exists('path') && isset($settings['path']) && $settings['path'] == TRUE;
   $remove_slashes = !empty($settings['slashes']);
 
   if ($pathauto == TRUE) {
