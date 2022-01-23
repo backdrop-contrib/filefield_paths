@@ -47,7 +47,7 @@ function filefield_paths_uninstall() {
 /**
  * Implements hook_update_last_removed().
  */
-function hook_update_last_removed() {
+function filefield_paths_update_last_removed() {
   return 7107;
 }
 
