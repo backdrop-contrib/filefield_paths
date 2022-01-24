@@ -46,6 +46,7 @@ Current Maintainers
 -----------------
 
 - [Indigoxela](https://github.com/indigoxela)
+- Co-maintainers welcome!
 
 File (Field) Paths has been ported to Backdrop CMS by Leonid Kolesnik
 ([kleomash](https://github.com/kleomash)).
