@@ -1,5 +1,17 @@
-[FileFieldPathsTestCase]
-name = General functionality
+[FileFieldPathsGeneralTestCase]
+name = FileFieldPaths General functionality
 description = Test general functionality.
 group = File (Field) Paths
-file = filefield_paths.test
+file = filefield_paths.general.test
+
+[FileFieldPathsTextReplaceTestCase]
+name = Text replace functionality
+description = Tests text replace functionality.
+group = File (Field) Paths
+file = filefield_paths.text_replace.test
+
+[FileFieldPathsTokensTestCase]
+name = Token functionality
+description = Tests File (Field) Paths tokens.
+group = File (Field) Paths
+file = filefield_paths.tokens.test
