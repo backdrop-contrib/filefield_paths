@@ -1,31 +1,22 @@
 <?php
-
 /**
  * @file
  * Tests for the File (Field) Paths module.
  */
 
+require_once __DIR__ . '/filefield_paths.test';
+
 /**
  * Class FileFieldPathsTokensTestCase
  */
 class FileFieldPathsTokensTestCase extends FileFieldPathsTestCase {
-  /**
-   * @inheritdoc
-   */
-  public static function getInfo() {
-    return array(
-      'name'        => 'Token functionality',
-      'description' => 'Tests File (Field) Paths tokens.',
-      'group'       => 'File (Field) Paths',
-    );
-  }
 
   /**
    * @param $token
    * @param $value
    * @param $data
    */
-  public function assertToken($token, $value, $data) {
+  protected function assertToken($token, $value, $data) {
     $result = token_replace($token, $data);
     $this->assertEqual($result, $value, t('Token @token equals @value', array(
       '@token' => $token,
@@ -33,13 +24,25 @@ class FileFieldPathsTokensTestCase extends FileFieldPathsTestCase {
     )));
   }
 
+  protected function prepareTextFile() {
+    $text_file = current($this->backdropGetTestFiles('text'));
+    // Prepare a proper File entity.
+    $file = new File();
+    $file->uri = $text_file->uri;
+    $file->filename = basename($text_file->uri);
+    $file->filemime = file_get_mimetype($text_file->uri);
+    $fid = $file->save();
+    $test_file = file_load($fid);
+
+    return $test_file;
+  }
+
   /**
    * Test token values with a text file.
    */
   public function testTokensBasic() {
     // Prepare a test text file.
-    $text_file = $this->getTestFile('text');
-    file_save($text_file);
+    $text_file = $this->prepareTextFile();
 
     // Ensure tokens are processed correctly.
     $data = array('file' => $text_file);
@@ -53,8 +56,7 @@ class FileFieldPathsTokensTestCase extends FileFieldPathsTestCase {
    */
   public function testTokensMoved() {
     // Prepare a test text file.
-    $text_file = $this->getTestFile('text');
-    file_save($text_file);
+    $text_file = $this->prepareTextFile();
 
     // Move the text file.
     $moved_file = file_move($text_file, 'public://moved.diff');
@@ -70,15 +72,14 @@ class FileFieldPathsTokensTestCase extends FileFieldPathsTestCase {
    * Test token values with a multi-extension text file.
    */
   public function testTokensMultiExtension() {
+    config_set('system.core', 'file_transliterate_uploads', FALSE);
     // Prepare a test text file.
-    $text_file = $this->getTestFile('text');
-    file_unmanaged_copy($text_file->uri, 'public://text.multiext.txt');
-    $files         = file_scan_directory('public://', '/text\.multiext\.txt/');
-    $multiext_file = current($files);
-    file_save($multiext_file);
+    $text_file = $this->prepareTextFile();
+    $copy = file_copy($text_file, 'public://text.multiext.txt');
+    $copy->origname = 'text.multiext.txt';
 
     // Ensure tokens are processed correctly.
-    $data = array('file' => $multiext_file);
+    $data = array('file' => $copy);
     $this->assertToken('[file:ffp-name-only]', 'text.multiext', $data);
     $this->assertToken('[file:ffp-name-only-original]', 'text.multiext', $data);
     $this->assertToken('[file:ffp-extension-original]', 'txt', $data);
@@ -89,15 +90,14 @@ class FileFieldPathsTokensTestCase extends FileFieldPathsTestCase {
    * @see https://www.drupal.org/node/1292436
    */
   public function testTokensUTF() {
+    config_set('system.core', 'file_transliterate_uploads', FALSE);
     // Prepare a test text file.
-    $text_file = $this->getTestFile('text');
-    file_unmanaged_copy($text_file->uri, 'public://тест.txt');
-    $files    = file_scan_directory('public://', '/тест\.txt/');
-    $utf_file = current($files);
-    file_save($utf_file);
+    $text_file = $this->prepareTextFile();
+    $utf_file = file_copy($text_file, 'public://тест.txt');
 
     // Ensure tokens are processed correctly.
     $data = array('file' => $utf_file);
     $this->assertToken('[file:ffp-name-only]', 'тест', $data);
   }
+
 }

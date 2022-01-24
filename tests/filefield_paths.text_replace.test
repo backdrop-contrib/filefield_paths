@@ -1,24 +1,15 @@
 <?php
-
 /**
  * @file
  * Tests for the File (Field) Paths module.
  */
 
+require_once __DIR__ . '/filefield_paths.test';
+
 /**
  * Class FileFieldPathsTextReplaceTestCase
  */
 class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
-  /**
-   * @inheritdoc
-   */
-  public static function getInfo() {
-    return array(
-      'name'        => 'Text replace functionality',
-      'description' => 'Tests text replace functionality.',
-      'group'       => 'File (Field) Paths',
-    );
-  }
 
   /**
    * Generates all variations of the URI for text replacement.
@@ -43,7 +34,7 @@ class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
 
     foreach ($variations as $key => $value) {
       $variations["{$key}_urlencode"]          = urlencode($value);
-      $variations["{$key}_drupal_encode_path"] = drupal_encode_path($value);
+      $variations["{$key}_backdrop_encode_path"] = backdrop_encode_path($value);
     }
 
     return $variations;
@@ -54,36 +45,40 @@ class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
    */
   public function testTextReplace() {
     $langcode = LANGUAGE_NONE;
+    // Enforce transliteration to be off, otherwise the "complex" check for a
+    // file with a whitespace makes no sense.
+    config_set('system.core', 'file_transliterate_uploads', FALSE);
 
     // Create a File field with 'node/[node:nid]' as the File path and
     // '[node:nid].png’ as the File name,
-    $field_name                                                 = drupal_strtolower($this->randomName());
+    $field_name = backdrop_strtolower($this->randomName());
     $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
     $instance_settings['filefield_paths']['file_name']['value'] = '[node:nid].png';
     $this->createImageField($field_name, $this->content_type, array(), $instance_settings);
 
     // Prepare test files.
-    $test_files['basic_image']   = $this->getTestFile('image');
-    $test_files['complex_image'] = $this->getTestFile('image');
+    $image_files = $this->backdropGetTestFiles('image');
+    $test_files['basic_image']   = current($image_files);
+    $test_files['complex_image'] = $test_files['basic_image'];
     file_unmanaged_copy($test_files['complex_image']->uri, 'public://test image.png');
-    $files                       = file_scan_directory('public://', '/test image\.png/');
+    $files = file_scan_directory('public://', '/test image\.png/');
     $test_files['complex_image'] = current($files);
 
     // Iterate over each test file.
     foreach ($test_files as $type => $test_file) {
       // Get the available file paths for the test file.
-      $uri          = str_replace('public://', variable_get('filefield_paths_temp_location', 'public://filefield_paths') . '/', $test_file->uri);
+      $uri = str_replace('public://', config_get('filefield_paths.settings', 'filefield_paths_temp_location') . '/', $test_file->uri);
       $source_paths = $this->getPathVariations($uri);
 
       // Upload a file and reference the original path(s) to the file in the body
       // field.
       $edit['title']                              = $this->randomName();
       $edit["body[{$langcode}][0][value]"]        = '';
-      $edit["files[{$field_name}_{$langcode}_0]"] = drupal_realpath($test_file->uri);
+      $edit["files[{$field_name}_{$langcode}_0]"] = backdrop_realpath($test_file->uri);
       foreach ($source_paths as $key => $value) {
         $edit["body[{$langcode}][0][value]"] .= "{$key}: {$value}\n";
       }
-      $this->drupalPost("node/add/{$this->content_type}", $edit, t('Save'));
+      $this->backdropPost("node/add/{$this->content_type}", $edit, t('Save'));
 
       // Get created Node ID.
       $matches = array();
@@ -91,11 +86,11 @@ class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
       $nid = $matches[1];
 
       // Ensure body field has updated file path.
-      $node              = node_load($nid);
+      $node = node_load($nid, NULL, TRUE);
       $destination_paths = $this->getPathVariations($node->{$field_name}[$langcode][0]['uri']);
       foreach ($destination_paths as $key => $value) {
         $this->assert($source_paths[$key] !== $destination_paths[$key] && strpos($node->body[$langcode][0]['value'], "{$key}: {$value}") !== FALSE, t('@type %key file path replaced successfully.', array(
-          '@type' => str_replace('_', ' ', drupal_ucfirst($type)),
+          '@type' => str_replace('_', ' ', backdrop_ucfirst($type)),
           '%key'  => $key
         )));
       }
