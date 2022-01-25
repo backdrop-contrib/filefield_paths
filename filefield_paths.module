@@ -282,6 +282,7 @@ function _filefield_paths_batch_update_process($objects, $instance, &$context) {
 
   // Process nodes by groups of 5.
   $count = min(5, count($context['sandbox']['objects']));
+  $oids = array();
   for ($i = 1; $i <= $count; $i++) {
     // For each oid, load the object, update the files and save it.
     $oid    = array_shift($context['sandbox']['objects']);
@@ -306,9 +307,15 @@ function _filefield_paths_batch_update_process($objects, $instance, &$context) {
       $instance['settings']['filefield_paths']['active_updating'] = $active_updating;
       field_update_instance($instance);
     }
+    $oids[] = $oid;
 
     // Update our progress information.
     $context['sandbox']['progress']++;
+  }
+  // Clear the entity cache for processed items.
+  $cache_table = 'cache_entity_' . $instance['entity_type'];
+  if (db_table_exists($cache_table)) {
+    cache_clear_all($oids, $cache_table);
   }
 
   // Inform the batch engine that we are not finished,
