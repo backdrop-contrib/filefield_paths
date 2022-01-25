@@ -15,3 +15,27 @@ name = Token functionality
 description = Tests File (Field) Paths tokens.
 group = File (Field) Paths
 file = filefield_paths.tokens.test
+
+[FileFieldPathsTransliterationCase]
+name = Transliteration integration
+description = Tests the transliteration integration.
+group = File (Field) Paths
+file = transliteration.test
+
+[FileFieldPathsRedirectTestCase]
+name = Redirect module integration
+description = Test redirect module integration.
+group = File (Field) Paths
+file = redirect.test
+
+[FileFieldPathsPathautoCase]
+name = Path(auto) integration
+description = Tests the Path module integration.
+group = File (Field) Paths
+file = pathauto.test
+
+[FileFieldPathsUpdatesCase]
+name = Update functionality
+description = Tests retroactive and active updates functionality.
+group = File (Field) Paths
+file = filefield_paths.update.test
