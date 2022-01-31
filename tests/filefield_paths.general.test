@@ -153,6 +153,8 @@ class FileFieldPathsGeneralTestCase extends FileFieldPathsTestCase {
    * This test is broken.
    */
   public function testProgrammaticAttach() {
+    // Contains function filefield_paths_filefield_paths_process_file.
+    require_once __DIR__ . '/../includes/filefield_paths.inc';
     // Create a File field with 'node/[node:nid]' as the File path and
     // '[node:nid].[file:ffp-extension-original]' as the File name.
     $field_name = backdrop_strtolower($this->randomName());
@@ -185,9 +187,7 @@ class FileFieldPathsGeneralTestCase extends FileFieldPathsTestCase {
 
     // Ensure that the File path has been processed correctly.
     $node = node_load($node->nid, NULL, TRUE);
-    // @todo This fails, sometimes. Sometimes it passes.
-    // Most annoying: it always passes locally, but fails in GHA.
-    //$this->assertEqual("public://node/{$node->nid}/{$node->nid}.txt", $node->{$field_name}[LANGUAGE_NONE][0]['uri'], t('The File path has been processed correctly.'));
+    $this->assertEqual("public://node/{$node->nid}/{$node->nid}.txt", $node->{$field_name}[LANGUAGE_NONE][0]['uri'], t('The File path has been processed correctly.'));
   }
 
   /**
