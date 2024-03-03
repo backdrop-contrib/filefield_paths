@@ -1,0 +1,13 @@
+parameters:
+  level: 0
+  scanDirectories:
+    - ../../../../core
+    - ../../
+  fileExtensions:
+    - module
+    - inc
+    - install
+    - test
+  excludePaths:
+    - *.drush.inc
+    - *.api.php

@@ -17,6 +17,7 @@ class FileFieldPathsRedirectTestCase extends FileFieldPathsTestCase {
   public function setUp() {
     // Setup required modules.
     parent::setUp(array('redirect'));
+    return TRUE;
   }
 
   /**
