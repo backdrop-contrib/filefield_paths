@@ -80,6 +80,7 @@ class FileFieldPathsTestCase extends BackdropWebTestCase {
       'delete files',
     ));
     $this->backdropLogin($this->admin_user);
+    return TRUE;
   }
 
   /**
