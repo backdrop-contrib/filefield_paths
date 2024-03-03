@@ -474,15 +474,8 @@ function _filefield_paths_replace_path($old, $new, $entity) {
 
   $paths = implode('|', $paths);
 
-  // Newer versions of the Image module add an 8 character token which is
-  // required if the image style hasn't been generated yet.
-  $itok = '';
-  if (defined('IMAGE_DERIVATIVE_TOKEN')) {
-    $itok = '((?:[\?|&](?:\S+?&)*|(?:%3F|%26)(?:\S+?%26)*)' . IMAGE_DERIVATIVE_TOKEN . '(?:=|%3D)(\S{8}))*';
-  }
-
   // Build regular expression pattern.
-  $pattern = "/({$prefixes})({$styles})*({$paths}){$itok}/";
+  $pattern = "/({$prefixes})({$styles})*({$paths})/";
 
   // Create an anonymous function for the replacement via preg_replace_callback.
   $callback = function($matches) use ($new, $old) {
@@ -599,16 +592,6 @@ function filefield_paths_replace_path_callback($matches, $new, $old) {
   // Replace styles directory.
   if (!empty($styles)) {
     $styles = str_replace($old_info['scheme'], $new_info['scheme'], $styles);
-
-    // Newer versions of the Image module add an 8 character token which is
-    // required if the image style hasn't been generated yet.
-    if (defined('IMAGE_DERIVATIVE_TOKEN') && isset($matches[7])) {
-      $image_style = !empty($matches[3]) ? $matches[3] : $matches[4];
-      // Only replace the token if the old one was valid.
-      if ($matches[7] == image_style_path_token($image_style, $old)) {
-        $query = substr_replace($query, image_style_path_token($image_style, $new), -strlen($matches[7]));
-      }
-    }
   }
 
   // Replace path.
