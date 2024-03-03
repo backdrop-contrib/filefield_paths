@@ -7,7 +7,7 @@
 require_once __DIR__ . '/filefield_paths.test';
 
 /**
- * Class FileFieldPathsTransliterationCase
+ * Tests filefield_paths transliteration handling.
  */
 class FileFieldPathsTransliterationCase extends FileFieldPathsTestCase {
 

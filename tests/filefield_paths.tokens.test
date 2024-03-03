@@ -7,23 +7,29 @@
 require_once __DIR__ . '/filefield_paths.test';
 
 /**
- * Class FileFieldPathsTokensTestCase
+ * Tests filefield_paths token handling.
  */
 class FileFieldPathsTokensTestCase extends FileFieldPathsTestCase {
 
   /**
-   * @param $token
-   * @param $value
-   * @param $data
+   * @param string $token
+   *   The token string.
+   * @param string $value
+   *   The result to compare.
+   * @param array $data
+   *   Token replacement values.
    */
-  protected function assertToken($token, $value, $data) {
+  protected function assertToken($token, $value, array $data) {
     $result = token_replace($token, $data);
     $this->assertEqual($result, $value, t('Token @token equals @value', array(
       '@token' => $token,
-      '@value' => $value
+      '@value' => $value,
     )));
   }
 
+  /**
+   *
+   */
   protected function prepareTextFile() {
     $text_file = current($this->backdropGetTestFiles('text'));
     // Prepare a proper File entity.

@@ -1,14 +1,11 @@
 <?php
-
 /**
  * @file
  * Image module integration.
  */
 
 /**
- * Implements hook_filefield_paths_field_type_info() on behalf of image.module.
- *
- * @return array
+ * Implements hook_filefield_paths_field_type_info() for image.module.
  */
 function image_filefield_paths_field_type_info() {
   return array('image');
@@ -16,10 +13,8 @@ function image_filefield_paths_field_type_info() {
 
 /**
  * Implements hook_menu_alter().
- *
- * @param $items
  */
-function filefield_paths_menu_alter(&$items) {
+function filefield_paths_menu_alter(array &$items) {
   // Workaround for issue with 'temporary://' image styles not being generated
   // correctly in Drupal core Image module.
   // @see https://www.drupal.org/node/2560139

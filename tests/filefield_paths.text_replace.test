@@ -7,15 +7,17 @@
 require_once __DIR__ . '/filefield_paths.test';
 
 /**
- * Class FileFieldPathsTextReplaceTestCase
+ * Test filefield_paths text replacements.
  */
 class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
 
   /**
    * Generates all variations of the URI for text replacement.
    *
-   * @param        $uri
+   * @param string $uri
+   *   Uri.
    * @param string $type
+   *   File type.
    *
    * @return mixed
    */
@@ -50,7 +52,7 @@ class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
     config_set('system.core', 'file_transliterate_uploads', FALSE);
 
     // Create a File field with 'node/[node:nid]' as the File path and
-    // '[node:nid].png’ as the File name,
+    // '[node:nid].png’ as the File name.
     $field_name = backdrop_strtolower($this->randomName());
     $instance_settings['filefield_paths']['file_path']['value'] = 'node/[node:nid]';
     $instance_settings['filefield_paths']['file_name']['value'] = '[node:nid].png';
@@ -70,8 +72,8 @@ class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
       $uri = str_replace('public://', config_get('filefield_paths.settings', 'filefield_paths_temp_location') . '/', $test_file->uri);
       $source_paths = $this->getPathVariations($uri);
 
-      // Upload a file and reference the original path(s) to the file in the body
-      // field.
+      // Upload a file and reference the original path(s) to the file in the
+      // body field.
       $edit['title']                              = $this->randomName();
       $edit["body[{$langcode}][0][value]"]        = '';
       $edit["files[{$field_name}_{$langcode}_0]"] = backdrop_realpath($test_file->uri);
@@ -91,7 +93,7 @@ class FileFieldPathsTextReplaceTestCase extends FileFieldPathsTestCase {
       foreach ($destination_paths as $key => $value) {
         $this->assert($source_paths[$key] !== $destination_paths[$key] && strpos($node->body[$langcode][0]['value'], "{$key}: {$value}") !== FALSE, t('@type %key file path replaced successfully.', array(
           '@type' => str_replace('_', ' ', backdrop_ucfirst($type)),
-          '%key'  => $key
+          '%key'  => $key,
         )));
       }
     }

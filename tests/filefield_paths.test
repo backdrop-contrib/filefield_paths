@@ -1,12 +1,11 @@
 <?php
-
 /**
  * @file
  * Tests for the File (Field) Paths module.
  */
 
 /**
- * Class FileFieldPathsTestCase.
+ * Tests filefield_paths module functionality.
  */
 class FileFieldPathsTestCase extends BackdropWebTestCase {
   protected $profile = 'testing';
@@ -137,7 +136,7 @@ class FileFieldPathsTestCase extends BackdropWebTestCase {
    * @param array $widget_settings
    *   A list of widget settings that will be added to the widget defaults.
    */
-  protected function createImageField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
+  protected function createImageField($name, $type_name, array $field_settings = array(), array $instance_settings = array(), array $widget_settings = array()) {
     $field             = array(
       'field_name'  => $name,
       'type'        => 'image',

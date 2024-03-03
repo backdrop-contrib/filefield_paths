@@ -7,7 +7,7 @@
 require_once __DIR__ . '/filefield_paths.test';
 
 /**
- * Class FileFieldPathsGeneralTestCase.
+ * General tests for filefield_paths.
  */
 class FileFieldPathsGeneralTestCase extends FileFieldPathsTestCase {
 

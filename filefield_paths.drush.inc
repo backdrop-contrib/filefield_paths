@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Drush integration.
@@ -16,7 +15,7 @@ function filefield_paths_drush_command() {
     'arguments'   => array(
       'entity_type' => 'Entity type.',
       'bundle_name' => 'Bundle name.',
-      'field_name'  => 'Field name.'
+      'field_name'  => 'Field name.',
     ),
     'options'     => array(
       'all' => 'Retroactively update all File (Field) Paths.',
@@ -34,12 +33,6 @@ function filefield_paths_drush_command() {
 
 /**
  * Retroactively updates all File (Field) Paths of a chosen field instance.
- *
- * @param null $entity_type
- * @param null $bundle_name
- * @param null $field_name
- *
- * @return string
  */
 function drush_filefield_paths_ffp_update($entity_type = NULL, $bundle_name = NULL, $field_name = NULL) {
   // Build array of information of all entity types, bundle names and field
@@ -160,10 +153,8 @@ function drush_filefield_paths_ffp_update($entity_type = NULL, $bundle_name = NU
 
 /**
  * Helper function; Invokes File (Field) Paths Retroactive updates.
- *
- * @param $instances
  */
-function _filefield_paths_drush_ffp_update($instances) {
+function _filefield_paths_drush_ffp_update(array $instances) {
   foreach ($instances as $instance) {
     if (filefield_paths_batch_update($instance)) {
       $batch                =& batch_get();

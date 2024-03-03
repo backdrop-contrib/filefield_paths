@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Tokens for the File (Field) Paths module.
@@ -29,12 +28,6 @@ function filefield_paths_token_info() {
 
 /**
  * Implements hook_tokens().
- *
- * @param       $type
- * @param       $tokens
- * @param array $data
- *
- * @return array
  */
 function filefield_paths_tokens($type, $tokens, array $data = array()) {
   $url_options = array('absolute' => TRUE);

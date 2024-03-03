@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  *
@@ -7,11 +6,9 @@
  */
 
 /**
- * @param $form
- * @param $form_state
- * @return mixed
+ * Settings form callback.
  */
-function filefield_paths_settings_form($form, $form_state) {
+function filefield_paths_settings_form(array $form, array $form_state) {
   $form['#config'] = 'filefield_paths.settings';
   $temp_location = config_get('filefield_paths.settings', 'filefield_paths_temp_location');
   if (empty($temp_location)) {
@@ -30,12 +27,8 @@ function filefield_paths_settings_form($form, $form_state) {
 
 /**
  * Validation callback for 'Temporary file location' setting.
- *
- * @param $element
- * @param $form_state
- * @return bool
  */
-function filefield_paths_settings_form_temp_location_validate($element, $form_state) {
+function filefield_paths_settings_form_temp_location_validate(array $element, array $form_state) {
   $scheme = file_uri_scheme($element['#value']);
   if (!$scheme) {
     form_error($element, t('Invalid file location. You must include a file stream wrapper (e.g., public://).'));

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Install, update and uninstall functions for the File (Field) Paths module.
@@ -8,10 +7,10 @@
 /**
  * Implements hook_schema_alter().
  *
- * @param $schema
- *   The system-wide schema
+ * @param array $schema
+ *   The system-wide schema.
  */
-function filefield_paths_schema_alter(&$schema) {
+function filefield_paths_schema_alter(array &$schema) {
   $schema['file_managed']['fields']['origname'] = array(
     'description' => 'Original name of the file.',
     'type'        => 'varchar',

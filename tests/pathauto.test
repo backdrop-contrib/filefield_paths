@@ -7,7 +7,7 @@
 require_once __DIR__ . '/filefield_paths.test';
 
 /**
- * Class FileFieldPathsPathautoCase.
+ * Pathauto module tests for filefield_paths.
  */
 class FileFieldPathsPathautoCase extends FileFieldPathsTestCase {
 

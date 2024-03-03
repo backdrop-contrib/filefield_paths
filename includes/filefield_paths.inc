@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * File (Field) Paths module integration.
@@ -7,11 +6,6 @@
 
 /**
  * Implements hook_filefield_paths_field_settings().
- *
- * @param $field
- * @param $instance
- *
- * @return array
  */
 function filefield_paths_filefield_paths_field_settings($field, $instance) {
   return array(
@@ -39,27 +33,14 @@ function filefield_paths_filefield_paths_field_settings($field, $instance) {
           '#default_value' => '[file:ffp-name-only-original].[file:ffp-extension-original]',
         ),
       ),
-    )
+    ),
   );
 }
 
  /**
  * Implements hook_filefield_paths_process_file().
- *
- * @param $type
- *   The entity type containing the files for processing.
- * @param $entity
- *   The entity containing the files for processing.
- * @param $field
- *   The definition of the field containing the files for processing.
- * @param $instance
- *   The instance of the field containing the files for processing.
- * @param $langcode
- *   The language code of the field containing the files for processing.
- * @param $items
- *   A pass-by-reference array of all the files for processing.
  */
-function filefield_paths_filefield_paths_process_file($type, $entity, $field, $instance, $langcode, &$items) {
+function filefield_paths_filefield_paths_process_file($type, $entity, array $field, array $instance, $langcode, array &$items) {
   if (isset($instance['settings']['filefield_paths'])) {
     $settings = $instance['settings']['filefield_paths'];
 
@@ -86,7 +67,7 @@ function filefield_paths_filefield_paths_process_file($type, $entity, $field, $i
 
         $token_data = array(
           'file' => entity_create('file', $file),
-          $type  => $entity
+          $type  => $entity,
         );
 
         // Copy the original file for comparison purposes.
