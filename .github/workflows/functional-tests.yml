@@ -28,6 +28,7 @@ jobs:
         with:
           php-version: ${{ env.USE_PHP_V }}
           coverage: none
+          tools: none
 
       - name: Checkout Backdrop core
         uses: actions/checkout@v4
