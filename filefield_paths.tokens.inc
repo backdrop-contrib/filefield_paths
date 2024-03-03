@@ -38,10 +38,6 @@ function filefield_paths_token_info() {
  */
 function filefield_paths_tokens($type, $tokens, array $data = array()) {
   $url_options = array('absolute' => TRUE);
-  if (isset($language)) {
-    $url_options['language'] = $language;
-  }
-
   $replacements = array();
 
   if ($type == 'file' && !empty($data['file'])) {

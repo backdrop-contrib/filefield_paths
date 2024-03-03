@@ -341,7 +341,7 @@ function _filefield_paths_batch_update_process($objects, $instance, &$context) {
   // Clear the entity cache for processed items.
   $cache_table = 'cache_entity_' . $instance['entity_type'];
   if (db_table_exists($cache_table)) {
-    cache_clear_all($oids, $cache_table);
+    cache($cache_table)->deleteMultiple($oids);
   }
 
   // Inform the batch engine that we are not finished,
@@ -403,11 +403,11 @@ function filefield_paths_field_storage_pre_update($entity_type, $entity) {
 /**
  * Implements hook_file_presave().
  *
- * @param $file
+ * @param File $file
  */
 function filefield_paths_file_presave($file) {
   // Store original filename in the database.
-  if (empty($file->origname) && isset($file->filename)) {
+  if (empty($file->origname)) {
     $file->origname = $file->filename;
   }
 }
@@ -549,13 +549,13 @@ function _filefield_paths_replace_path_get_prefixes($scheme, $preg_quote = FALSE
 /**
  * Callback for regex string replacement functionality.
  *
- * @param $matches
+ * @param array $matches
  * @param $new
  * @param $old
  *
  * @return string
  */
-function filefield_paths_replace_path_callback($matches, $new, $old) {
+function filefield_paths_replace_path_callback(array $matches, $new, $old) {
   $prefix = $matches[1];
   $styles = $matches[2];
   $query  = isset($matches[6]) ? $matches[6] : '';
