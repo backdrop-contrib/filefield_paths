@@ -360,12 +360,13 @@ function filefield_paths_field_storage_pre_insert($entity_type, $entity) {
 function filefield_paths_field_storage_pre_update($entity_type, $entity) {
   $field_types = _filefield_paths_get_field_types();
   $entity_info = entity_get_info($entity_type);
-  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+  $bundle = $entity->bundle();
   if ($entity_info['fieldable']) {
-    foreach (field_info_fields() as $field) {
-      if (in_array($field['type'], array_keys($field_types))) {
+    $field_instances = field_info_instances($entity_type, $bundle);
+    foreach ($field_instances as $field_name => $instance) {
+      $field = field_info_field($field_name);
+      if ($field && array_key_exists($field['type'], $field_types)) {
         $files    = array();
-        $instance = field_info_instance($entity_type, $field['field_name'], $bundle);
         $enabled  = (isset($instance['settings']['filefield_paths_enabled']) && $instance['settings']['filefield_paths_enabled']) || !isset($instance['settings']['filefield_paths_enabled']);
         if ($enabled && isset($entity->{$field['field_name']}) && is_array($entity->{$field['field_name']})) {
           foreach ($entity->{$field['field_name']} as $langcode => &$deltas) {
