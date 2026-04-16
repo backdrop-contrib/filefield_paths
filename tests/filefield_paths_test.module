@@ -14,3 +14,20 @@ function filefield_paths_test_stream_wrappers_alter(array &$wrappers) {
   $wrappers['ffp']         = $wrappers['public'];
   $wrappers['ffp']['type'] = STREAM_WRAPPERS_READ_VISIBLE;
 }
+
+/**
+ * Implements hook_node_insert().
+ *
+ * @param Node $node
+ *   Node object.
+ */
+function filefield_paths_test_node_insert(Node $node) {
+  if ($node->title == 'ffp_uri_collision') {
+    $files = $node->ffp_uri_collision[LANGUAGE_NONE];
+    $uris = array();
+    foreach ($files as $file) {
+      $uris[] = $file['uri'];
+    }
+    state_set('ffp_uri_collision_uris', $uris);
+  }
+}
